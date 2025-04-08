@@ -29,7 +29,7 @@
       new THREE.MeshBasicMaterial({ color: new THREE.Color("white") }),  
       new THREE.MeshBasicMaterial({ color: new THREE.Color("blue") }),   
       new THREE.MeshBasicMaterial({ color: new THREE.Color("black") }), 
-      new THREE.MeshBasicMaterial({ color: new THREE.Color("red") }),    
+      new THREE.MeshBasicMaterial({ color: new THREE.Color("red"), side: THREE.DoubleSide }),    
       new THREE.MeshBasicMaterial({ color: new THREE.Color("brown") })   
     ];
 
@@ -54,15 +54,15 @@
     waterMesh.position.z = 100;
 
     // Hole on the green  
-    var holeGeo = new THREE.CylinderGeometry(1.5, 1.5, 0.5, 32);
+    var holeGeo = new THREE.CylinderGeometry(5, 5, 0.5, 32);
     var holeMesh = new THREE.Mesh(holeGeo, materials[3]);
     holeMesh.position.set(0, 0.25, -180);
     scene.add(holeMesh);
 
     // Flagpole 
-    var poleGeo = new THREE.CylinderGeometry(0.2, 0.2, 25); 
+    var poleGeo = new THREE.CylinderGeometry(1, 1, 75); 
     var poleMesh = new THREE.Mesh(poleGeo, materials[1]);
-    poleMesh.position.set(0, 12.5, -180);
+    poleMesh.position.set(0, 33.5, -180);
     scene.add(poleMesh);
 
     // Flag 
@@ -83,9 +83,9 @@
       return geom;
     }
 
-    var flagGeom = createFlagTriangle(8, 10);
+    var flagGeom = createFlagTriangle(15, 20);
     var flagMesh = new THREE.Mesh(flagGeom, materials[4]);
-    flagMesh.position.set(0.2, 17.5, -180);
+    flagMesh.position.set(0.2, 45, -180);
     scene.add(flagMesh);
 
     
