@@ -3,12 +3,8 @@
 
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-
   <title>Mini Golf</title>
   <style>
-    /* feel free to style the canvas any way you want. If you want it to
-      use the entire window, set width: 100% and height: 100%. */
-
     canvas {
       display: block;
       margin: 10px auto;
@@ -22,53 +18,121 @@
   <script src="./js/OrbitControls.js"></script>
   <script src="./js/SceneUtils.js"></script>
   <script src="js/dat.gui.js"></script>
-
 </head>
 
 <body>
   <h1>Mini Golf</h1>
 
   <script>
-    // black and red materials
     var materials = [
-      new THREE.MeshBasicMaterial({ color: new THREE.Color("green") }),
-      new THREE.MeshBasicMaterial({ color: new THREE.Color("white") }),
-      new THREE.MeshBasicMaterial({ color: new THREE.Color("blue") })
+      new THREE.MeshBasicMaterial({ color: new THREE.Color("green") }),  // 0
+      new THREE.MeshBasicMaterial({ color: new THREE.Color("white") }),  // 1
+      new THREE.MeshBasicMaterial({ color: new THREE.Color("blue") }),   // 2
+      new THREE.MeshBasicMaterial({ color: new THREE.Color("black") }),  // 3 - Hole
+      new THREE.MeshBasicMaterial({ color: new THREE.Color("red") }),    // 4 - Flag
+      new THREE.MeshBasicMaterial({ color: new THREE.Color("brown") })   // 5 - Boat
     ];
 
     var scene = new THREE.Scene();
 
+    // Green course
     var mat = new THREE.PlaneGeometry(50, 400);
     var matMesh = new THREE.Mesh(mat, materials[0]);
-    matMesh.rotation.x = -Math.PI/2;
+    matMesh.rotation.x = -Math.PI / 2;
 
+    // Ball
     var ball = new THREE.SphereGeometry(5);
     var ballMesh = new THREE.Mesh(ball, materials[1]);
     ballMesh.position.y = 5;
     ballMesh.position.z = 180;
 
+    // Water
     var water = new THREE.PlaneGeometry(80, 80);
     var waterMesh = new THREE.Mesh(water, materials[2]);
-    waterMesh.rotation.x = -Math.PI/2;
+    waterMesh.rotation.x = -Math.PI / 2;
     waterMesh.position.x = 150;
     waterMesh.position.z = 100;
 
+    // Hole on the green  
+    var holeGeo = new THREE.CylinderGeometry(1.5, 1.5, 0.5, 32);
+    var holeMesh = new THREE.Mesh(holeGeo, materials[3]);
+    holeMesh.position.set(0, 0.25, -180);
+    scene.add(holeMesh);
+
+    // Flagpole 
+    var poleGeo = new THREE.CylinderGeometry(0.2, 0.2, 25); 
+    var poleMesh = new THREE.Mesh(poleGeo, materials[1]);
+    poleMesh.position.set(0, 12.5, -180);
+    scene.add(poleMesh);
+
+    // Flag 
+    function createFlagTriangle(width, height) {
+      var geom = new THREE.Geometry();
+      var w2 = 0.5 * width;
+
+      // Define vertices
+      geom.vertices.push(
+        new THREE.Vector3(0, 0, 0),              // bottom
+        new THREE.Vector3(width, height / 2, 0), // tip
+        new THREE.Vector3(0, height, 0)          // top
+      );
+
+      
+      geom.faces.push(new THREE.Face3(0, 1, 2));
+      geom.computeFaceNormals();
+      return geom;
+    }
+
+    var flagGeom = createFlagTriangle(8, 10);
+    var flagMesh = new THREE.Mesh(flagGeom, materials[4]);
+    flagMesh.position.set(0.2, 17.5, -180);
+    scene.add(flagMesh);
+
+    
+    var boatBase = new THREE.BoxGeometry(16, 3, 6); 
+    var boatMesh = new THREE.Mesh(boatBase, materials[5]);
+    boatMesh.position.set(150, 1.5, 100);
+    scene.add(boatMesh);
+
+    
+    function createSailTriangle(width, height) {
+      var geom = new THREE.Geometry();
+      var w2 = 0.5 * width;
+
+      geom.vertices.push(
+        new THREE.Vector3(0, 0, 0),               // bottom
+        new THREE.Vector3(0, height, 0),          // top
+        new THREE.Vector3(width, height / 2, 0)   // tip
+      );
+
+      
+      geom.faces.push(new THREE.Face3(0, 1, 2));
+      geom.computeFaceNormals();
+      return geom;
+    }
+
+    var sailGeom = createSailTriangle(10, 14); 
+    var sailMaterial = new THREE.MeshBasicMaterial({ color: "white", side: THREE.DoubleSide });
+    var sailMesh = new THREE.Mesh(sailGeom, sailMaterial);
+    sailMesh.position.set(150, 3, 100);
+    scene.add(sailMesh);
+
+    // Add ground and ball
     scene.add(waterMesh);
     scene.add(ballMesh);
     scene.add(matMesh);
 
+    // Render scene
     var renderer = new THREE.WebGLRenderer();
-
     TW.mainInit(renderer, scene);
 
     TW.cameraSetup(renderer,
-      scene,
-      {
-        minx: -200, maxx: 200,
-        miny: 0, maxy: 100,
-        minz: -200, maxz: 200
-      });
-
+    scene,
+    {
+      minx: -60, maxx: 220,
+      miny: 0, maxy: 100,
+      minz: -200, maxz: 120
+    });
   </script>
 </body>
 
