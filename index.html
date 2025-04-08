@@ -31,14 +31,30 @@
   <script>
     // black and red materials
     var materials = [
-      new THREE.MeshBasicMaterial({ color: new THREE.Color("green") })
+      new THREE.MeshBasicMaterial({ color: new THREE.Color("green") }),
+      new THREE.MeshBasicMaterial({ color: new THREE.Color("white") }),
+      new THREE.MeshBasicMaterial({ color: new THREE.Color("blue") })
     ];
 
     var scene = new THREE.Scene();
-    var mat = new THREE.PlaneGeometry(200, 200);
-    var matMesh = new THREE.Mesh(mat, materials);
+
+    var mat = new THREE.PlaneGeometry(50, 400);
+    var matMesh = new THREE.Mesh(mat, materials[0]);
     matMesh.rotation.x = -Math.PI/2;
 
+    var ball = new THREE.SphereGeometry(5);
+    var ballMesh = new THREE.Mesh(ball, materials[1]);
+    ballMesh.position.y = 5;
+    ballMesh.position.z = 180;
+
+    var water = new THREE.PlaneGeometry(80, 80);
+    var waterMesh = new THREE.Mesh(water, materials[2]);
+    waterMesh.rotation.x = -Math.PI/2;
+    waterMesh.position.x = 150;
+    waterMesh.position.z = 100;
+
+    scene.add(waterMesh);
+    scene.add(ballMesh);
     scene.add(matMesh);
 
     var renderer = new THREE.WebGLRenderer();
