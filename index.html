@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+  <title>Clown</title>
+  <style>
+    /* feel free to style the canvas any way you want. If you want it to
+      use the entire window, set width: 100% and height: 100%. */
+
+    canvas {
+      display: block;
+      margin: 10px auto;
+      width: 80%;
+      height: 70%;
+    }
+  </style>
+
+  <script src="./js/three.js"></script>
+  <script src="./js/tw.js"></script>
+  <script src="./js/OrbitControls.js"></script>
+  <script src="./js/SceneUtils.js"></script>
+  <script src="js/dat.gui.js"></script>
+
+</head>
+
+<body>
+  <h1>Mini Golf</h1>
+
+  <script>
+    // black and red materials
+    var materials = [
+      new THREE.MeshBasicMaterial({ color: new THREE.Color("green") })
+    ];
+
+    var scene = new THREE.Scene();
+    var mat = new THREE.PlaneGeometry(200, 200);
+    var matMesh = new THREE.Mesh(mat, materials);
+    matMesh.rotation.x = -Math.PI/2;
+
+    scene.add(matMesh);
+
+    var renderer = new THREE.WebGLRenderer();
+
+    TW.mainInit(renderer, scene);
+
+    TW.cameraSetup(renderer,
+      scene,
+      {
+        minx: -200, maxx: 200,
+        miny: 0, maxy: 100,
+        minz: -200, maxz: 200
+      });
+
+  </script>
+</body>
+
+</html>
