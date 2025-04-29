@@ -133,7 +133,7 @@
     // Windmill
     function addWindmill(scene) {
       const loader = new THREE.TextureLoader();
-      const bodyTexture = loader.load('./textures/brick.jpg'); // Replace with your texture path
+      const bodyTexture = loader.load('brick.jpg'); 
       const bodyMaterial = new THREE.MeshBasicMaterial({ map: bodyTexture });
 
       // Windmill body
@@ -157,7 +157,7 @@
 
       for (let i = 0; i < 3; i++) {
         const blade = new THREE.Mesh(createBlade(), bladeMaterial);
-        blade.position.set(0, 30, 0);
+        blade.position.set(0, 30, .5);
         blade.rotation.z = i * (Math.PI * 2 / 3);
         bladesGroup.add(blade);
       }
@@ -175,8 +175,22 @@
       const semiGeo = new THREE.ShapeGeometry(arcShape);
       const semiMaterial = new THREE.MeshBasicMaterial({ color: 'black' });
       const semi = new THREE.Mesh(semiGeo, semiMaterial);
-      semi.position.set(0, 0, 5);
+      semi.position.set(0, 0, 5.25);
       scene.add(semi);
+
+      // Semicircle
+      const arcShape1 = new THREE.Shape();
+      arcShape1.absarc(0, 0, 4, 0, Math.PI, false);
+      const hole1 = new THREE.Path();
+      hole1.absarc(0, 0, 3, 0, Math.PI, false);
+      arcShape1.holes.push(hole1);
+
+      const semiGeo1 = new THREE.ShapeGeometry(arcShape1);
+      const semiMaterial1 = new THREE.MeshBasicMaterial({ color: 'black' });
+      const semi1 = new THREE.Mesh(semiGeo1, semiMaterial1);
+      semi1.rotation.y = Math.PI; // Flip to face backward
+      semi1.position.set(0, 0, -5.25); // Symmetrical placement
+      scene.add(semi1);
 
     }
 
