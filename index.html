@@ -130,16 +130,6 @@
       }
     });
 
-    var renderer = new THREE.WebGLRenderer();
-    TW.mainInit(renderer, scene);
-
-    TW.cameraSetup(renderer,
-    scene,
-    {
-      minx: -60, maxx: 220,
-      miny: 0, maxy: 100,
-      minz: -200, maxz: 120
-    });
     // Windmill
     function addWindmill(scene) {
       const loader = new THREE.TextureLoader();
