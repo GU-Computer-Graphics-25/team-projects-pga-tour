@@ -27,22 +27,26 @@
 
     const materials = {
       green: new THREE.MeshBasicMaterial({ color: "green" }),
-      white: new THREE.MeshBasicMaterial({ color: "white" }),
+      white: new THREE.MeshPhongMaterial({ color: "white", shininies: 0 }),
       blue: new THREE.MeshBasicMaterial({ color: "blue" }),
       black: new THREE.MeshBasicMaterial({ color: "black" }),
-      red: new THREE.MeshBasicMaterial({ color: "red", side: THREE.DoubleSide }),
-      brown: new THREE.MeshBasicMaterial({ color: "brown" }),
+      red: new THREE.MeshPhongMaterial({ color: "red", shininies: 0, side: THREE.DoubleSide }),
+      brown: new THREE.MeshPhongMaterial({ color: "brown", shininess: 100 }),
       shiny: new THREE.MeshPhongMaterial({ color: "white", shininess: 100 }),
       bladeShiny: new THREE.MeshPhongMaterial({ color: "gray", shininess: 100, side: THREE.DoubleSide })
     };
 
     // Lights
-    const light = new THREE.PointLight(0xffffff, 1);
-    light.position.set(50, 100, 50);
-    scene.add(light);
+    // const light = new THREE.PointLight(0xffffff, 1);
+    // light.position.set(50, 100, 50);
+    // scene.add(light);
+    const light = new THREE.AmbientLight( 0x404040, 0.25 ); // soft white light
+    scene.add( light );
     const directionalLight = new THREE.DirectionalLight(0xffffff, 1);  // Strong light
-    directionalLight.position.set(40, 200, 55).normalize();
+    directionalLight.position.set(0, 200, 55);
+    directionalLight.target.position.set(0, 0, -10);
     scene.add(directionalLight);
+    scene.add(directionalLight.target);
 
     // Green course
     const mat = new THREE.PlaneGeometry(50, 400);
@@ -81,7 +85,7 @@
 
     // Flagpole
     const poleGeo = new THREE.CylinderGeometry(1, 1, 75);
-    const poleMesh = new THREE.Mesh(poleGeo, materials.white);
+    const poleMesh = new THREE.Mesh(poleGeo, materials.shiny);
     poleMesh.position.set(0, 33.5, -180);
     scene.add(poleMesh);
 
