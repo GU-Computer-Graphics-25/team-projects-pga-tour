@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta charset="UTF-8">
   <title>Mini Golf</title>
   <style>
     canvas {
@@ -14,60 +14,58 @@
   </style>
 
   <script src="./js/three.js"></script>
-  <script src="./js/tw.js"></script>
   <script src="./js/OrbitControls.js"></script>
-  <script src="./js/SceneUtils.js"></script>
-  <script src="js/dat.gui.js"></script>
 </head>
 
 <body>
   <h1>Mini Golf</h1>
 
   <script>
-    var materials = [
-      new THREE.MeshBasicMaterial({ color: new THREE.Color("green") }),
-      new THREE.MeshBasicMaterial({ color: new THREE.Color("white") }),
-      new THREE.MeshBasicMaterial({ color: new THREE.Color("blue") }),
-      new THREE.MeshBasicMaterial({ color: new THREE.Color("black") }),
-      new THREE.MeshBasicMaterial({ color: new THREE.Color("red"), side: THREE.DoubleSide }),
-      new THREE.MeshBasicMaterial({ color: new THREE.Color("brown") })
+    const scene = new THREE.Scene();
+
+    const materials = [
+      new THREE.MeshBasicMaterial({ color: "green" }),
+      new THREE.MeshBasicMaterial({ color: "white" }),
+      new THREE.MeshBasicMaterial({ color: "blue" }),
+      new THREE.MeshBasicMaterial({ color: "black" }),
+      new THREE.MeshBasicMaterial({ color: "red", side: THREE.DoubleSide }),
+      new THREE.MeshBasicMaterial({ color: "brown" })
     ];
 
-    var scene = new THREE.Scene();
-
     // Green course
-    var mat = new THREE.PlaneGeometry(50, 400);
-    var matMesh = new THREE.Mesh(mat, materials[0]);
+    const mat = new THREE.PlaneGeometry(50, 400);
+    const matMesh = new THREE.Mesh(mat, materials[0]);
     matMesh.rotation.x = -Math.PI / 2;
+    scene.add(matMesh);
 
     // Ball
-    var ball = new THREE.SphereGeometry(5);
-    var ballMesh = new THREE.Mesh(ball, materials[1]);
-    ballMesh.position.y = 5;
-    ballMesh.position.z = 180;
+    const ball = new THREE.SphereGeometry(5);
+    const ballMesh = new THREE.Mesh(ball, materials[1]);
+    ballMesh.position.set(0, 5, 180);
+    scene.add(ballMesh);
 
     // Water
-    var water = new THREE.PlaneGeometry(80, 80);
-    var waterMesh = new THREE.Mesh(water, materials[2]);
+    const water = new THREE.PlaneGeometry(80, 80);
+    const waterMesh = new THREE.Mesh(water, materials[2]);
     waterMesh.rotation.x = -Math.PI / 2;
-    waterMesh.position.x = 150;
-    waterMesh.position.z = 100;
+    waterMesh.position.set(150, 0, 100);
+    scene.add(waterMesh);
 
-    // Hole on the green  
-    var holeGeo = new THREE.CylinderGeometry(5, 5, 0.5, 32);
-    var holeMesh = new THREE.Mesh(holeGeo, materials[3]);
+    // Hole
+    const holeGeo = new THREE.CylinderGeometry(5, 5, 0.5, 32);
+    const holeMesh = new THREE.Mesh(holeGeo, materials[3]);
     holeMesh.position.set(0, 0.25, -180);
     scene.add(holeMesh);
 
-    // Flagpole 
-    var poleGeo = new THREE.CylinderGeometry(1, 1, 75);
-    var poleMesh = new THREE.Mesh(poleGeo, materials[1]);
+    // Flagpole
+    const poleGeo = new THREE.CylinderGeometry(1, 1, 75);
+    const poleMesh = new THREE.Mesh(poleGeo, materials[1]);
     poleMesh.position.set(0, 33.5, -180);
     scene.add(poleMesh);
 
-    // Flag 
+    // Flag
     function createFlagTriangle(width, height) {
-      var geom = new THREE.Geometry();
+      const geom = new THREE.Geometry();
       geom.vertices.push(
         new THREE.Vector3(0, 0, 0),
         new THREE.Vector3(width, height / 2, 0),
@@ -78,19 +76,20 @@
       return geom;
     }
 
-    var flagGeom = createFlagTriangle(15, 20);
-    var flagMesh = new THREE.Mesh(flagGeom, materials[4]);
+    const flagGeom = createFlagTriangle(15, 20);
+    const flagMesh = new THREE.Mesh(flagGeom, materials[4]);
     flagMesh.position.set(0.2, 45, -180);
     scene.add(flagMesh);
 
     // Boat
-    var boatBase = new THREE.BoxGeometry(16, 3, 6);
-    var boatMesh = new THREE.Mesh(boatBase, materials[5]);
+    const boatBase = new THREE.BoxGeometry(16, 3, 6);
+    const boatMesh = new THREE.Mesh(boatBase, materials[5]);
     boatMesh.position.set(150, 1.5, 100);
     scene.add(boatMesh);
 
+    // Sail
     function createSailTriangle(width, height) {
-      var geom = new THREE.Geometry();
+      const geom = new THREE.Geometry();
       geom.vertices.push(
         new THREE.Vector3(0, 0, 0),
         new THREE.Vector3(0, height, 0),
@@ -101,25 +100,25 @@
       return geom;
     }
 
-    var sailGeom = createSailTriangle(10, 14);
-    var sailMaterial = new THREE.MeshBasicMaterial({ color: "white", side: THREE.DoubleSide });
-    var sailMesh = new THREE.Mesh(sailGeom, sailMaterial);
+    const sailGeom = createSailTriangle(10, 14);
+    const sailMaterial = new THREE.MeshBasicMaterial({ color: "white", side: THREE.DoubleSide });
+    const sailMesh = new THREE.Mesh(sailGeom, sailMaterial);
     sailMesh.position.set(150, 3, 100);
     scene.add(sailMesh);
 
     // Windmill
     function addWindmill(scene) {
       const loader = new THREE.TextureLoader();
-      const bodyTexture = loader.load('brick.jpg'); 
+      const bodyTexture = loader.load('./textures/brick.jpg'); // Replace with your texture path
       const bodyMaterial = new THREE.MeshBasicMaterial({ map: bodyTexture });
 
       // Windmill body
       const bodyGeo = new THREE.BoxGeometry(10, 30, 10);
       const body = new THREE.Mesh(bodyGeo, bodyMaterial);
-      body.position.set(0, 15, 0); // Center of the green
+      body.position.set(0, 15, 0);
       scene.add(body);
 
-      // Blade triangle
+      // Blades
       function createBlade() {
         const shape = new THREE.Shape();
         shape.moveTo(0, 0);
@@ -139,10 +138,10 @@
         bladesGroup.add(blade);
       }
 
-      bladesGroup.position.set(0, 0, 5); // In front of the windmill body
+      bladesGroup.position.set(0, 0, 5);
       scene.add(bladesGroup);
 
-      // Semicircle (bottom front of base)
+      // Semicircle
       const arcShape = new THREE.Shape();
       arcShape.absarc(0, 0, 4, 0, Math.PI, false);
       const hole = new THREE.Path();
@@ -152,29 +151,36 @@
       const semiGeo = new THREE.ShapeGeometry(arcShape);
       const semiMaterial = new THREE.MeshBasicMaterial({ color: 'black' });
       const semi = new THREE.Mesh(semiGeo, semiMaterial);
-      semi.position.set(0, 0, 5); // Base front
-      semi.rotation.set(0, 0, 0); // Face forward
+      semi.position.set(0, 0, 5);
       scene.add(semi);
 
     }
 
-    // Add scene elements
-    scene.add(waterMesh);
-    scene.add(ballMesh);
-    scene.add(matMesh);
-    addWindmill(scene); 
+    addWindmill(scene);
 
-    // Render scene
-    var renderer = new THREE.WebGLRenderer();
-    TW.mainInit(renderer, scene);
+    // Camera setup
+    const camera = new THREE.PerspectiveCamera(
+      45, window.innerWidth / window.innerHeight, 0.1, 1000
+    );
+    camera.position.set(0, 80, 120);
+    camera.lookAt(0, 15, 0);
 
-    TW.cameraSetup(renderer,
-      scene,
-      {
-        minx: -60, maxx: 220,
-        miny: 0, maxy: 100,
-        minz: -200, maxz: 120
-      });
+    // Renderer
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth * 0.8, window.innerHeight * 0.7);
+    document.body.appendChild(renderer.domElement);
+
+    // Orbit controls
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.target.set(0, 15, 0);
+    controls.update();
+
+    // Animate scene
+    function animate() {
+      requestAnimationFrame(animate);
+      renderer.render(scene, camera);
+    }
+    animate();
   </script>
 </body>
 
