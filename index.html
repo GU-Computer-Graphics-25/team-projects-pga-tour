@@ -47,7 +47,7 @@
     ballMesh.position.z = ballPos;
     scene.add(ballMesh);
 
-    function animate(){
+    function animateBall(){
       requestAnimationFrame(animate);
 
       // Move the sphere along the -Z axis
@@ -126,7 +126,7 @@
 
     document.addEventListener("keypress", (event) => {
       if (event.key === 'w') { // Listen for the 'w' key press
-        animate();
+        animateBall();
       }
     });
 
@@ -181,6 +181,26 @@
     }
 
     addWindmill(scene);
+
+    //Boundary Outline
+    function addBezierCurve(p0, p1, p2, p3, color = 0xff0000) {
+      const curve = new THREE.CubicBezierCurve3(p0, p1, p2, p3);
+      const points = curve.getPoints(50);
+      const geometry = new THREE.BufferGeometry().setFromPoints(points);
+      const material = new THREE.LineBasicMaterial({ color });
+      const curveObject = new THREE.Line(geometry, material);
+      scene.add(curveObject);
+    }
+
+    const offsetX = 100;
+    const offsetZ = 140;
+
+    addBezierCurve(new THREE.Vector3(-offsetX, 0, -offsetZ), new THREE.Vector3(-40, 0, -200), new THREE.Vector3(40, 0, -200), new THREE.Vector3(offsetX, 0, -offsetZ), 0x3498db);
+    addBezierCurve(new THREE.Vector3(-offsetX, 0, offsetZ), new THREE.Vector3(-40, 0, 200), new THREE.Vector3(40, 0, 200), new THREE.Vector3(offsetX, 0, offsetZ), 0xe67e22);
+    addBezierCurve(new THREE.Vector3(-offsetX, 0, -offsetZ), new THREE.Vector3(-200, 0, -80), new THREE.Vector3(-200, 0, 80), new THREE.Vector3(-offsetX, 0, offsetZ), 0x9b59b6);
+    addBezierCurve(new THREE.Vector3(offsetX, 0, -offsetZ), new THREE.Vector3(200, 0, -80), new THREE.Vector3(200, 0, 80), new THREE.Vector3(offsetX, 0, offsetZ), 0xf1c40f);
+
+
 
     // Camera setup
     const camera = new THREE.PerspectiveCamera(
