@@ -25,12 +25,12 @@
 
   <script>
     var materials = [
-      new THREE.MeshBasicMaterial({ color: new THREE.Color("green") }),  
-      new THREE.MeshBasicMaterial({ color: new THREE.Color("white") }),  
-      new THREE.MeshBasicMaterial({ color: new THREE.Color("blue") }),   
-      new THREE.MeshBasicMaterial({ color: new THREE.Color("black") }), 
-      new THREE.MeshBasicMaterial({ color: new THREE.Color("red"), side: THREE.DoubleSide }),    
-      new THREE.MeshBasicMaterial({ color: new THREE.Color("brown") })   
+      new THREE.MeshBasicMaterial({ color: new THREE.Color("green") }),
+      new THREE.MeshBasicMaterial({ color: new THREE.Color("white") }),
+      new THREE.MeshBasicMaterial({ color: new THREE.Color("blue") }),
+      new THREE.MeshBasicMaterial({ color: new THREE.Color("black") }),
+      new THREE.MeshBasicMaterial({ color: new THREE.Color("red"), side: THREE.DoubleSide }),
+      new THREE.MeshBasicMaterial({ color: new THREE.Color("brown") })
     ];
 
     var scene = new THREE.Scene();
@@ -60,7 +60,7 @@
     scene.add(holeMesh);
 
     // Flagpole 
-    var poleGeo = new THREE.CylinderGeometry(1, 1, 75); 
+    var poleGeo = new THREE.CylinderGeometry(1, 1, 75);
     var poleMesh = new THREE.Mesh(poleGeo, materials[1]);
     poleMesh.position.set(0, 33.5, -180);
     scene.add(poleMesh);
@@ -68,16 +68,11 @@
     // Flag 
     function createFlagTriangle(width, height) {
       var geom = new THREE.Geometry();
-      var w2 = 0.5 * width;
-
-      // Define vertices
       geom.vertices.push(
-        new THREE.Vector3(0, 0, 0),              // bottom
-        new THREE.Vector3(width, height / 2, 0), // tip
-        new THREE.Vector3(0, height, 0)          // top
+        new THREE.Vector3(0, 0, 0),
+        new THREE.Vector3(width, height / 2, 0),
+        new THREE.Vector3(0, height, 0)
       );
-
-      
       geom.faces.push(new THREE.Face3(0, 1, 2));
       geom.computeFaceNormals();
       return geom;
@@ -88,51 +83,98 @@
     flagMesh.position.set(0.2, 45, -180);
     scene.add(flagMesh);
 
-    
-    var boatBase = new THREE.BoxGeometry(16, 3, 6); 
+    // Boat
+    var boatBase = new THREE.BoxGeometry(16, 3, 6);
     var boatMesh = new THREE.Mesh(boatBase, materials[5]);
     boatMesh.position.set(150, 1.5, 100);
     scene.add(boatMesh);
 
-    
     function createSailTriangle(width, height) {
       var geom = new THREE.Geometry();
-      var w2 = 0.5 * width;
-
       geom.vertices.push(
-        new THREE.Vector3(0, 0, 0),               // bottom
-        new THREE.Vector3(0, height, 0),          // top
-        new THREE.Vector3(width, height / 2, 0)   // tip
+        new THREE.Vector3(0, 0, 0),
+        new THREE.Vector3(0, height, 0),
+        new THREE.Vector3(width, height / 2, 0)
       );
-
-      
       geom.faces.push(new THREE.Face3(0, 1, 2));
       geom.computeFaceNormals();
       return geom;
     }
 
-    var sailGeom = createSailTriangle(10, 14); 
+    var sailGeom = createSailTriangle(10, 14);
     var sailMaterial = new THREE.MeshBasicMaterial({ color: "white", side: THREE.DoubleSide });
     var sailMesh = new THREE.Mesh(sailGeom, sailMaterial);
     sailMesh.position.set(150, 3, 100);
     scene.add(sailMesh);
 
-    // Add ground and ball
+    // Windmill
+    function addWindmill(scene) {
+      const loader = new THREE.TextureLoader();
+      const bodyTexture = loader.load('brick.jpg'); 
+      const bodyMaterial = new THREE.MeshBasicMaterial({ map: bodyTexture });
+
+      // Windmill body
+      const bodyGeo = new THREE.BoxGeometry(10, 30, 10);
+      const body = new THREE.Mesh(bodyGeo, bodyMaterial);
+      body.position.set(0, 15, 0); // Center of the green
+      scene.add(body);
+
+      // Blade triangle
+      function createBlade() {
+        const shape = new THREE.Shape();
+        shape.moveTo(0, 0);
+        shape.lineTo(4, 8);
+        shape.lineTo(-4, 8);
+        shape.lineTo(0, 0);
+        return new THREE.ShapeGeometry(shape);
+      }
+
+      const bladeMaterial = new THREE.MeshBasicMaterial({ color: 'gray', side: THREE.DoubleSide });
+      const bladesGroup = new THREE.Group();
+
+      for (let i = 0; i < 3; i++) {
+        const blade = new THREE.Mesh(createBlade(), bladeMaterial);
+        blade.position.set(0, 30, 0);
+        blade.rotation.z = i * (Math.PI * 2 / 3);
+        bladesGroup.add(blade);
+      }
+
+      bladesGroup.position.set(0, 0, 5); // In front of the windmill body
+      scene.add(bladesGroup);
+
+      // Semicircle (bottom front of base)
+      const arcShape = new THREE.Shape();
+      arcShape.absarc(0, 0, 4, 0, Math.PI, false);
+      const hole = new THREE.Path();
+      hole.absarc(0, 0, 3, 0, Math.PI, false);
+      arcShape.holes.push(hole);
+
+      const semiGeo = new THREE.ShapeGeometry(arcShape);
+      const semiMaterial = new THREE.MeshBasicMaterial({ color: 'black' });
+      const semi = new THREE.Mesh(semiGeo, semiMaterial);
+      semi.position.set(0, 0, 5); // Base front
+      semi.rotation.set(0, 0, 0); // Face forward
+      scene.add(semi);
+
+    }
+
+    // Add scene elements
     scene.add(waterMesh);
     scene.add(ballMesh);
     scene.add(matMesh);
+    addWindmill(scene); 
 
     // Render scene
     var renderer = new THREE.WebGLRenderer();
     TW.mainInit(renderer, scene);
 
     TW.cameraSetup(renderer,
-    scene,
-    {
-      minx: -60, maxx: 220,
-      miny: 0, maxy: 100,
-      minz: -200, maxz: 120
-    });
+      scene,
+      {
+        minx: -60, maxx: 220,
+        miny: 0, maxy: 100,
+        minz: -200, maxz: 120
+      });
   </script>
 </body>
 
