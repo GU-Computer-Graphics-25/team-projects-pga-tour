@@ -21,47 +21,64 @@
   <h1>Mini Golf</h1>
 
   <script>
-    var ballPos = 180;
+    let ballPos = 180;
     const scene = new THREE.Scene();
 
-    const materials = [
-      new THREE.MeshBasicMaterial({ color: "green" }),
-      new THREE.MeshPhongMaterial({ color: "white", shininess: 100 }),
-      new THREE.MeshBasicMaterial({ color: "blue" }),
-      new THREE.MeshBasicMaterial({ color: "black" }),
-      new THREE.MeshBasicMaterial({ color: "red", side: THREE.DoubleSide }),
-      new THREE.MeshBasicMaterial({ color: "brown" })
-    ];
+    const materials = {
+      green: new THREE.MeshBasicMaterial({ color: "green" }),
+      white: new THREE.MeshBasicMaterial({ color: "white" }),
+      blue: new THREE.MeshBasicMaterial({ color: "blue" }),
+      black: new THREE.MeshBasicMaterial({ color: "black" }),
+      red: new THREE.MeshBasicMaterial({ color: "red", side: THREE.DoubleSide }),
+      brown: new THREE.MeshBasicMaterial({ color: "brown" }),
+      shiny: new THREE.MeshPhongMaterial({ color: "white", shininess: 100 }),
+      bladeShiny: new THREE.MeshPhongMaterial({ color: "gray", shininess: 100, side: THREE.DoubleSide })
+    };
+
+    // Lights
+    const light = new THREE.PointLight(0xffffff, 1);
+    light.position.set(50, 100, 50);
+    scene.add(light);
+    scene.add(new THREE.AmbientLight(0x404040));
 
     // Green course
     const mat = new THREE.PlaneGeometry(50, 400);
-    const matMesh = new THREE.Mesh(mat, materials[0]);
+    const matMesh = new THREE.Mesh(mat, materials.green);
     matMesh.rotation.x = -Math.PI / 2;
     scene.add(matMesh);
 
     // Ball
-    var ball = new THREE.SphereGeometry(5);
-    var ballMesh = new THREE.Mesh(ball, materials[1]);
+    const ball = new THREE.SphereGeometry(5);
+    const ballMesh = new THREE.Mesh(ball, materials.shiny);
     ballMesh.position.y = 5;
     ballMesh.position.z = ballPos;
     scene.add(ballMesh);
 
+    // Animate ball movement
+    function animateBall() {
+      requestAnimationFrame(animateBall);
+      if (ballMesh.position.z > -180) {
+        ballMesh.position.z -= 0.05;
+      }
+      renderer.render(scene, camera);
+    }
+
     // Water
     const water = new THREE.PlaneGeometry(80, 80);
-    const waterMesh = new THREE.Mesh(water, materials[2]);
+    const waterMesh = new THREE.Mesh(water, materials.blue);
     waterMesh.rotation.x = -Math.PI / 2;
     waterMesh.position.set(150, 0, 100);
     scene.add(waterMesh);
 
     // Hole
     const holeGeo = new THREE.CylinderGeometry(5, 5, 0.5, 32);
-    const holeMesh = new THREE.Mesh(holeGeo, materials[3]);
+    const holeMesh = new THREE.Mesh(holeGeo, materials.black);
     holeMesh.position.set(0, 0.25, -180);
     scene.add(holeMesh);
 
     // Flagpole
     const poleGeo = new THREE.CylinderGeometry(1, 1, 75);
-    const poleMesh = new THREE.Mesh(poleGeo, materials[1]);
+    const poleMesh = new THREE.Mesh(poleGeo, materials.white);
     poleMesh.position.set(0, 33.5, -180);
     scene.add(poleMesh);
 
@@ -79,13 +96,13 @@
     }
 
     const flagGeom = createFlagTriangle(15, 20);
-    const flagMesh = new THREE.Mesh(flagGeom, materials[4]);
+    const flagMesh = new THREE.Mesh(flagGeom, materials.red);
     flagMesh.position.set(0.2, 45, -180);
     scene.add(flagMesh);
 
     // Boat
     const boatBase = new THREE.BoxGeometry(16, 3, 6);
-    const boatMesh = new THREE.Mesh(boatBase, materials[5]);
+    const boatMesh = new THREE.Mesh(boatBase, materials.brown);
     boatMesh.position.set(150, 1.5, 100);
     scene.add(boatMesh);
 
@@ -108,29 +125,16 @@
     sailMesh.position.set(150, 3, 100);
     scene.add(sailMesh);
 
-    // Add ground and ball
-    scene.add(waterMesh);
-    scene.add(matMesh);
-
-    document.addEventListener("keypress", (event) => {
-      if (event.key === 'w') { // Listen for the 'w' key press
-        animateBall();
-      }
-    });
-
     // Windmill
-    function addWindmill(scene) {
+    function addWindmill() {
       const loader = new THREE.TextureLoader();
-      const bodyTexture = loader.load('brick.jpg');
-      const bodyMaterial = new THREE.MeshBasicMaterial({ map: bodyTexture });
+      const bodyMaterial = new THREE.MeshBasicMaterial({ map: loader.load('brick.jpg') });
 
-      // Windmill body (scaled up)
       const bodyGeo = new THREE.BoxGeometry(20, 60, 20);
       const body = new THREE.Mesh(bodyGeo, bodyMaterial);
       body.position.set(0, 30, 0);
       scene.add(body);
 
-      // Blades
       function createBlade() {
         const shape = new THREE.Shape();
         shape.moveTo(0, 0);
@@ -140,20 +144,16 @@
         return new THREE.ShapeGeometry(shape);
       }
 
-      const bladeMaterial = new THREE.MeshPhongMaterial({ color: 'gray', side: THREE.DoubleSide, shininess: 100 });
       const bladesGroup = new THREE.Group();
-
       for (let i = 0; i < 3; i++) {
-        const blade = new THREE.Mesh(createBlade(), bladeMaterial);
+        const blade = new THREE.Mesh(createBlade(), materials.bladeShiny);
         blade.position.set(0, 60, 1);
         blade.rotation.z = i * (Math.PI * 2 / 3);
         bladesGroup.add(blade);
       }
-
       bladesGroup.position.set(0, 0, 10);
       scene.add(bladesGroup);
 
-      // Semicircle front
       const arcShape = new THREE.Shape();
       arcShape.absarc(0, 0, 4, 0, Math.PI, false);
       const hole = new THREE.Path();
@@ -161,12 +161,10 @@
       arcShape.holes.push(hole);
 
       const semiGeo = new THREE.ShapeGeometry(arcShape);
-      const semiMaterial = new THREE.MeshBasicMaterial({ color: 'black' });
-      const semi = new THREE.Mesh(semiGeo, semiMaterial);
+      const semi = new THREE.Mesh(semiGeo, materials.black);
       semi.position.set(0, 0, 10.25);
       scene.add(semi);
 
-      // Semicircle back
       const arcShape1 = new THREE.Shape();
       arcShape1.absarc(0, 0, 4, 0, Math.PI, false);
       const hole1 = new THREE.Path();
@@ -174,48 +172,20 @@
       arcShape1.holes.push(hole1);
 
       const semiGeo1 = new THREE.ShapeGeometry(arcShape1);
-      const semiMaterial1 = new THREE.MeshBasicMaterial({ color: 'black' });
-      const semi1 = new THREE.Mesh(semiGeo1, semiMaterial1);
+      const semi1 = new THREE.Mesh(semiGeo1, materials.black);
       semi1.rotation.y = Math.PI;
       semi1.position.set(0, 0, -10.25);
       scene.add(semi1);
     }
 
-    addWindmill(scene);
+    addWindmill();
 
-    //Boundary Outline
-    function addBezierCurve(p0, p1, p2, p3, color = 0xff0000) {
-      const curve = new THREE.CubicBezierCurve3(p0, p1, p2, p3);
-      const points = curve.getPoints(50);
-      const geometry = new THREE.BufferGeometry().setFromPoints(points);
-      const material = new THREE.LineBasicMaterial({ color });
-      const curveObject = new THREE.Line(geometry, material);
-      scene.add(curveObject);
-    }
-
-    const offsetX = 100;
-    const offsetZ = 140;
-
-    addBezierCurve(new THREE.Vector3(-offsetX, 0, -offsetZ), new THREE.Vector3(-40, 0, -200), new THREE.Vector3(40, 0, -200), new THREE.Vector3(offsetX, 0, -offsetZ), 0x3498db);
-    addBezierCurve(new THREE.Vector3(-offsetX, 0, offsetZ), new THREE.Vector3(-40, 0, 200), new THREE.Vector3(40, 0, 200), new THREE.Vector3(offsetX, 0, offsetZ), 0xe67e22);
-    addBezierCurve(new THREE.Vector3(-offsetX, 0, -offsetZ), new THREE.Vector3(-200, 0, -80), new THREE.Vector3(-200, 0, 80), new THREE.Vector3(-offsetX, 0, offsetZ), 0x9b59b6);
-    addBezierCurve(new THREE.Vector3(offsetX, 0, -offsetZ), new THREE.Vector3(200, 0, -80), new THREE.Vector3(200, 0, 80), new THREE.Vector3(offsetX, 0, offsetZ), 0xf1c40f);
-
-
-
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5); // Brighter ambient
-    scene.add(ambientLight);
-
-    const pointLight = new THREE.PointLight(0xffffff, 1.5);
-    pointLight.position.set(50, 100, 50);
-    scene.add(pointLight);
-
-    // Camera setup (more zoomed in)
-    const camera = new THREE.PerspectiveCamera(
-      45, window.innerWidth / window.innerHeight, 0.1, 1000
-    );
-    camera.position.set(0, 60, 80);
-    camera.lookAt(0, 30, 0);
+    // Camera setup
+    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.set(0, 80, 120);
+    camera.lookAt(0, 15, 0);
+    let isMainCamera = true;
+    const altCameraPosition = new THREE.Vector3(100, 100, 0);
 
     // Renderer
     const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -224,7 +194,7 @@
 
     // Orbit controls
     const controls = new THREE.OrbitControls(camera, renderer.domElement);
-    controls.target.set(0, 30, 0);
+    controls.target.set(0, 15, 0);
     controls.update();
 
     // Animate scene
@@ -233,6 +203,22 @@
       renderer.render(scene, camera);
     }
     animate();
+
+    // Key listeners
+    document.addEventListener("keypress", (event) => {
+      if (event.key === 'w') {
+        animateBall();
+      } else if (event.key === '1') {
+        if (isMainCamera) {
+          camera.position.copy(altCameraPosition);
+          camera.lookAt(0, 15, 0);
+        } else {
+          camera.position.set(0, 80, 120);
+          camera.lookAt(0, 15, 0);
+        }
+        isMainCamera = !isMainCamera;
+      }
+    });
   </script>
 </body>
 
