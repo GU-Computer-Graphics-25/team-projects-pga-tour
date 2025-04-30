@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>Mini Golf</title>
+  <title>Mini Golf! press 'w' to move ball in hole and '1' to change camera</title>
   <style>
     canvas {
       display: block;
@@ -19,7 +19,7 @@
 </head>
 
 <body>
-  <h1>Mini Golf</h1>
+  <h1>Mini Golf! press 'w' to move ball in hole and '1' to change camera</h1>
 
   <script>
     let ballPos = 180;
@@ -27,10 +27,10 @@
 
     const materials = {
       green: new THREE.MeshBasicMaterial({ color: "green" }),
-      white: new THREE.MeshPhongMaterial({ color: "white", shininies: 0 }),
+      white: new THREE.MeshPhongMaterial({ color: "white", shininess: 0 }),
       blue: new THREE.MeshBasicMaterial({ color: "blue" }),
       black: new THREE.MeshBasicMaterial({ color: "black" }),
-      red: new THREE.MeshPhongMaterial({ color: "red", shininies: 0, side: THREE.DoubleSide }),
+      red: new THREE.MeshPhongMaterial({ color: "red", shininess: 0, side: THREE.DoubleSide }),
       brown: new THREE.MeshPhongMaterial({ color: "brown", shininess: 100 }),
       shiny: new THREE.MeshPhongMaterial({ color: "white", shininess: 100 }),
       bladeShiny: new THREE.MeshPhongMaterial({ color: "gray", shininess: 100, side: THREE.DoubleSide })
@@ -49,13 +49,16 @@
     scene.add(directionalLight.target);
 
     // Green course
+    const loader = new THREE.TextureLoader();
+    const grassTexture = loader.load('grass.jpg'); 
+    const greenMat = new THREE.MeshPhongMaterial({ map: grassTexture });
     const mat = new THREE.PlaneGeometry(50, 400);
-    const matMesh = new THREE.Mesh(mat, materials.green);
+    const matMesh = new THREE.Mesh(mat, greenMat);
     matMesh.rotation.x = -Math.PI / 2;
     scene.add(matMesh);
 
     // Ball
-    const ball = new THREE.SphereGeometry(5);
+    const ball = new THREE.SphereGeometry(3);
     const ballMesh = new THREE.Mesh(ball, materials.shiny);
     ballMesh.position.y = 5;
     ballMesh.position.z = ballPos;
@@ -71,10 +74,10 @@
     }
 
     // Water
-    const water = new THREE.PlaneGeometry(80, 80);
+    const water = new THREE.CircleGeometry(40, 32);  
     const waterMesh = new THREE.Mesh(water, materials.blue);
     waterMesh.rotation.x = -Math.PI / 2;
-    waterMesh.position.set(150, 0, 100);
+    waterMesh.position.set(80, 1, -130);  
     scene.add(waterMesh);
 
     // Hole
@@ -110,7 +113,7 @@
     // Boat
     const boatBase = new THREE.BoxGeometry(16, 3, 6);
     const boatMesh = new THREE.Mesh(boatBase, materials.brown);
-    boatMesh.position.set(150, 1.5, 100);
+    boatMesh.position.set(80, 2.5, -130);
     scene.add(boatMesh);
 
     // Sail
@@ -129,7 +132,7 @@
     const sailGeom = createSailTriangle(10, 14);
     const sailMaterial = new THREE.MeshBasicMaterial({ color: "white", side: THREE.DoubleSide });
     const sailMesh = new THREE.Mesh(sailGeom, sailMaterial);
-    sailMesh.position.set(150, 3, 100);
+    sailMesh.position.set(80, 3, -130);
     scene.add(sailMesh);
 
     // Windmill
