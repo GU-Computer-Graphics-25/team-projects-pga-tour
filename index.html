@@ -15,6 +15,7 @@
 
   <script src="./js/three.js"></script>
   <script src="./js/OrbitControls.js"></script>
+  <script src="./js/tw.js"></script>
 </head>
 
 <body>
@@ -26,20 +27,26 @@
 
     const materials = {
       green: new THREE.MeshBasicMaterial({ color: "green" }),
-      white: new THREE.MeshBasicMaterial({ color: "white" }),
+      white: new THREE.MeshPhongMaterial({ color: "white", shininies: 0 }),
       blue: new THREE.MeshBasicMaterial({ color: "blue" }),
       black: new THREE.MeshBasicMaterial({ color: "black" }),
-      red: new THREE.MeshBasicMaterial({ color: "red", side: THREE.DoubleSide }),
-      brown: new THREE.MeshBasicMaterial({ color: "brown" }),
+      red: new THREE.MeshPhongMaterial({ color: "red", shininies: 0, side: THREE.DoubleSide }),
+      brown: new THREE.MeshPhongMaterial({ color: "brown", shininess: 100 }),
       shiny: new THREE.MeshPhongMaterial({ color: "white", shininess: 100 }),
       bladeShiny: new THREE.MeshPhongMaterial({ color: "gray", shininess: 100, side: THREE.DoubleSide })
     };
 
     // Lights
-    const light = new THREE.PointLight(0xffffff, 1);
-    light.position.set(50, 100, 50);
-    scene.add(light);
-    scene.add(new THREE.AmbientLight(0x404040));
+    // const light = new THREE.PointLight(0xffffff, 1);
+    // light.position.set(50, 100, 50);
+    // scene.add(light);
+    const light = new THREE.AmbientLight( 0x404040, 0.25 ); // soft white light
+    scene.add( light );
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 1);  // Strong light
+    directionalLight.position.set(0, 200, 55);
+    directionalLight.target.position.set(0, 0, -10);
+    scene.add(directionalLight);
+    scene.add(directionalLight.target);
 
     // Green course
     const mat = new THREE.PlaneGeometry(50, 400);
@@ -78,7 +85,7 @@
 
     // Flagpole
     const poleGeo = new THREE.CylinderGeometry(1, 1, 75);
-    const poleMesh = new THREE.Mesh(poleGeo, materials.white);
+    const poleMesh = new THREE.Mesh(poleGeo, materials.shiny);
     poleMesh.position.set(0, 33.5, -180);
     scene.add(poleMesh);
 
@@ -180,6 +187,14 @@
 
     addWindmill();
 
+    // Terrain
+    const planeGeometry = new THREE.PlaneGeometry(500, 500); // Large plane for the course
+    const planeMaterial = new THREE.MeshLambertMaterial({ color: 0x3d8e32 }); // Grass-like color
+    const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+    plane.position.y -= 1;
+    plane.rotation.x = -Math.PI / 2; // Rotate the plane to be horizontal
+    scene.add(plane);
+    
     // Camera setup
     const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
     camera.position.set(0, 80, 120);
