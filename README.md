@@ -17,3 +17,8 @@ Loaded and applied textures to the grass of the lawn and the body of the windmil
 Press w to move the ball forward and press 1 to change camera angles
 ### Animation
 The scene is continuously rendered as the ball moves forward smoothly
+## Resources
+### https://threejs.org/docs/index.html
+used to build the base of our program and complete certain actions
+### https://www.packtpub.com/en-us/product/learn-threejs-9781803233871
+used as reference to determine how to use certain functions referenced above
